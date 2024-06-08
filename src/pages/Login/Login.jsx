@@ -1,0 +1,75 @@
+import { default as React, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import Logo from "../../assets/Logo.svg";
+import { Button } from "../../components/Button/Button";
+import { Input } from "../../components/Input/Input";
+import s from "./LoginStyles";
+
+function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate(); // Use o hook useNavigate
+
+  const handleLogin = async () => {
+    try {
+      // Faz a solicitação POST para o servidor backend com os dados de login
+      const response = await fetch('http://localhost:3001/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      // Verifica se a solicitação foi bem-sucedida
+      if (response.ok) {
+        // Se as credenciais forem válidas, redireciona para a página 'logged-plans'
+        navigate('/logged-plans'); // Use navigate() para redirecionar
+      } else {
+        // Se as credenciais forem inválidas, exibe uma mensagem de erro
+        setError('Credenciais inválidas');
+      }
+    } catch (error) {
+      // Em caso de erro, exibe uma mensagem de erro genérica
+      console.error('Erro ao tentar fazer login:', error);
+      setError('Erro ao tentar fazer login');
+    }
+  };
+
+  return (
+    <s.MainContainer>
+      <s.LeftContainer>
+        <img src={Logo} width={400} height={400} alt="Logo" />
+        <h1>Steps for Future</h1>
+      </s.LeftContainer>
+
+      <s.RightContainer>
+        <s.CenterContainer>
+          <Input
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Input
+            type="password"
+            placeholder="Senha"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+          
+          {/* Chama a função handleLogin ao clicar no botão */}
+          <Button variant='secondary' onClick={handleLogin}>Entrar</Button>
+
+          <Link to="/register">
+            <Button>Cadastre-se</Button>
+          </Link>
+        </s.CenterContainer>
+      </s.RightContainer>
+    </s.MainContainer>
+  );
+}
+
+export default Login;
